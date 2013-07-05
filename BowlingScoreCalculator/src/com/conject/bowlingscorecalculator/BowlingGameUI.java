@@ -12,7 +12,11 @@ import javax.swing.JTable;
 import javax.swing.border.MatteBorder;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
+import javax.swing.text.AbstractDocument;
+import javax.swing.text.BadLocationException;
+import javax.swing.text.DefaultFormatterFactory;
 import javax.swing.text.MaskFormatter;
+import javax.swing.text.PlainDocument;
 import javax.swing.JTextField;
 import com.jgoodies.forms.layout.FormLayout;
 import com.jgoodies.forms.layout.ColumnSpec;
@@ -57,7 +61,7 @@ public class BowlingGameUI extends JFrame implements PropertyChangeListener{
 	private JFormattedTextField frame10_Roll2_TextField;
 	private JFormattedTextField frame10_Roll1_TextField;
 	private JFormattedTextField frame10_Roll3_TextField;
-	private JFormattedTextField frame1_Score_TextField;
+	private JTextField frame1_Score_TextField;
 	private JFormattedTextField frame2_Score_TextField;
 	private JFormattedTextField frame3_Score_TextField;
 	private JFormattedTextField frame4_Score_TextField;
@@ -68,38 +72,38 @@ public class BowlingGameUI extends JFrame implements PropertyChangeListener{
 	private JFormattedTextField frame9_Score_TextField;
 	private JFormattedTextField frame10_Score_TextField;
 
-	private int frame1_Roll1_Score;
-	private int frame1_Roll2_Score;
-	private int frame2_Roll1_ScorE;
-	private int frame2_Roll2_Score;
-	private int frame3_Roll1_Score;
-	private int frame3_Roll2_Score;
-	private int frame4_Roll1_Score;
-	private int frame4_Roll2_Score;
-	private int frame5_Roll1_Score;
-	private int frame5_Roll2_Score;
-	private int frame6_Roll1_Score;
-	private int frame6_Roll2_Score;
-	private int frame7_Roll1_Score;
-	private int frame7_Roll2_Score;
-	private int frame8_Roll1_Score;
-	private int frame8_Roll2_Score;
-	private int frame9_Roll1_Score;
-	private int frame9_Roll2_Score;
-	private int frame10_Roll1_Score;
-	private int frame10_Roll2_Score;
-	private int frame10_Roll3_Score;
+	private int frame1_Roll1_Score = 0;
+	private int frame1_Roll2_Score = 0;
+	private int frame2_Roll1_Score = 0;
+	private int frame2_Roll2_Score = 0;
+	private int frame3_Roll1_Score = 0;
+	private int frame3_Roll2_Score = 0;
+	private int frame4_Roll1_Score = 0;
+	private int frame4_Roll2_Score = 0;
+	private int frame5_Roll1_Score = 0;
+	private int frame5_Roll2_Score = 0;
+	private int frame6_Roll1_Score = 0;
+	private int frame6_Roll2_Score = 0;
+	private int frame7_Roll1_Score = 0;
+	private int frame7_Roll2_Score = 0;
+	private int frame8_Roll1_Score = 0;
+	private int frame8_Roll2_Score = 0;
+	private int frame9_Roll1_Score = 0;
+	private int frame9_Roll2_Score = 0;
+	private int frame10_Roll1_Score = 0;
+	private int frame10_Roll2_Score = 0;
+	private int frame10_Roll3_Score = 0;
 	
-	private int frame1_Score;
-	private int frame2_Score;
-	private int frame3_Score;
-	private int frame4_Score;
-	private int frame5_Score;
-	private int frame6_Score;
-	private int frame7_Score;
-	private int frame8_Score;
-	private int frame9_Score;
-	private int frame10_Score;
+	private int frame1_Score = 0;
+	private int frame2_Score = 0;
+	private int frame3_Score = 0;
+	private int frame4_Score = 0;
+	private int frame5_Score = 0;
+	private int frame6_Score = 0;
+	private int frame7_Score = 0;
+	private int frame8_Score = 0;
+	private int frame9_Score = 0;
+	private int frame10_Score = 0;
 	
 
 	
@@ -112,7 +116,7 @@ public class BowlingGameUI extends JFrame implements PropertyChangeListener{
 	public BowlingGameUI() {
 		
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		setUpFormats();
+		//setUpFormats();
 		setBounds(100, 100, 633, 300);
 		contentPane = new JPanel();
 		contentPane.setBackground(Color.WHITE);
@@ -137,16 +141,34 @@ public class BowlingGameUI extends JFrame implements PropertyChangeListener{
 		panel_1.setBounds(12, 79, 411, 115);
 		contentPane.add(panel_1);
 		
-		frame1_Roll1_TextField = new JFormattedTextField(new InputFormatter());
-		frame1_Roll1_TextField.setValue(new Integer(0));
+		frame1_Roll1_TextField = new JFormattedTextField();
+		frame1_Roll1_TextField.setToolTipText("0...9 or X or /");
+		MaskFormatter inputMask;
+		try {
+			inputMask = new MaskFormatter("*");
+			inputMask.setValidCharacters("0123456789X/");
+			inputMask.setValueClass(String.class);   
+			DefaultFormatterFactory inputFormatterFactory = new 
+			         DefaultFormatterFactory(inputMask);
+			frame1_Roll1_TextField.setFormatterFactory(inputFormatterFactory);
+		} catch (ParseException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		
+
+		//frame1_Roll1_TextField.setText();
 		frame1_Roll1_TextField.addPropertyChangeListener("value",this);
 		frame1_Roll1_TextField.setBounds(20, 0, 33, 22);
 		frame1_Roll1_TextField.setColumns(10);
 		
-		frame1_Roll2_TextField = new JFormattedTextField(new InputFormatter());
+
+		
+		frame1_Roll2_TextField = new JFormattedTextField();
 		frame1_Roll2_TextField.setBounds(53, 0, 33, 22);
 		frame1_Roll2_TextField.setColumns(10);
-		frame1_Roll2_TextField.setValue(new Integer(0));
+		//frame1_Roll2_TextField.setValue("X");
 		frame1_Roll2_TextField.addPropertyChangeListener("value",this);
 		
 		frame2_Roll1_TextField = new JFormattedTextField();
@@ -250,7 +272,7 @@ public class BowlingGameUI extends JFrame implements PropertyChangeListener{
 		panel_1.add(frame10_Roll3_TextField);
 		
 		frame1_Score_TextField = new JFormattedTextField();
-		frame1_Score_TextField.setValue(new Integer(0));
+		frame1_Score_TextField.setText("0");
 		frame1_Score_TextField.setColumns(10);
 		frame1_Score_TextField.setBounds(33, 22, 33, 22);
 		frame1_Score_TextField.setEditable(false);
@@ -331,12 +353,25 @@ public class BowlingGameUI extends JFrame implements PropertyChangeListener{
 	  
 	  public void propertyChange(PropertyChangeEvent e) {
 	        Object source = e.getSource();
-	        if (source == frame1_Roll1_TextField) {
-	            frame1_Roll1_Score = ((Number)frame1_Roll1_TextField.getValue()).intValue();
-	        } else if (source == frame1_Roll2_TextField) {
-	        	frame1_Roll2_Score = ((Number)frame1_Roll2_TextField.getValue()).intValue();
+	        if (source == frame1_Roll1_TextField && (frame1_Roll1_TextField.getText().trim().length()>0)) {
+	        	if(frame1_Roll1_TextField.getText().equals("X") || frame1_Roll1_TextField.getText().equals("/") ){
+	        		frame1_Roll1_Score = 10;
+	        	}
+	        	else{
+	        		frame1_Roll1_Score =Integer.parseInt(frame1_Roll1_TextField.getText());
+	        	}
+	        } else if (source == frame1_Roll2_TextField && (frame1_Roll2_TextField.getText().trim().length()>0)) {
+	        	if(frame1_Roll2_TextField.getText().equals("X") || frame1_Roll2_TextField.getText().equals("/") ){
+	        		frame1_Roll2_Score = 10;
+	        	}
+	        	else{
+	        		frame1_Roll2_Score = Integer.parseInt(frame1_Roll2_TextField.getText());
+	        	}
 	        } 
-
+	        
+	       /* if(!(frame1_Roll1_TextField.getText().equals("")) || !(frame1_Roll2_TextField.getText().equals(""))){
+	        	frame1_Score = frame1_Roll1_Score + frame1_Roll2_Score;
+	        }*/
 	        frame1_Score = frame1_Roll1_Score + frame1_Roll2_Score;
 	        frame1_Score_TextField.setText(Integer.toString(frame1_Score));
 	        
