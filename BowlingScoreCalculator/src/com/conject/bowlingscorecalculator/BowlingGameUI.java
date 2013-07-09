@@ -39,12 +39,15 @@ import java.beans.PropertyChangeListener;
 import java.text.NumberFormat;
 import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.ListIterator;
+
 import javax.swing.JButton;
 
 public class BowlingGameUI extends JFrame implements PropertyChangeListener {
 
-	private JPanel contentPane;
+	private static JPanel contentPane;
 	private JFormattedTextField frame1_Roll1_TextField;
 	private JFormattedTextField frame1_Roll2_TextField;
 	private JFormattedTextField frame2_Roll1_TextField;
@@ -112,6 +115,7 @@ public class BowlingGameUI extends JFrame implements PropertyChangeListener {
 	private int frame10_Score = 0;
 
 	private Frame[] allFrames;
+	private static List<Frame> frames;
 	private static int gameScore;
 
 	private MaskFormatter roll1_MaskFormater;
@@ -120,11 +124,21 @@ public class BowlingGameUI extends JFrame implements PropertyChangeListener {
 	private DefaultFormatterFactory roll1_DefaultFormatterFactory;
 	private DefaultFormatterFactory roll2_DefaultFormatterFactory;
 	private DefaultFormatterFactory frame10_DefaultFormatterFactory;
+	
+	public static final int MAX_FRAMES = 10;
+	public static final int MAX_STRIKE_FRAME_SCORE = 10;
+	public static final int MIN_STRIKE_FRAME_SCORE = 0;
+	public static final int MAX_SPARE_FRAME_SCORE = 10;
 
 	/**
 	 * Create the frame.
 	 */
 	public BowlingGameUI() {
+		frames = new ArrayList<Frame>();
+		for(int i=0;i<MAX_FRAMES;i++){
+			frames.add(new Frame(false, false, 0, 0));
+		}
+		
 		allFrames = new Frame[10];
 		allFrames[0] = new Frame(false, false, 0, 0);
 		allFrames[1] = new Frame(false, false, 0, 0);
@@ -494,24 +508,31 @@ public class BowlingGameUI extends JFrame implements PropertyChangeListener {
 
 	public void propertyChange(PropertyChangeEvent e) {
 		Object source = e.getSource();
-
+		int currentFrameIndex;
 		// Frame 1
 		if (source == frame1_Roll1_TextField
 				&& (frame1_Roll1_TextField.getText().trim().length() > 0)) {
 			frame1_Roll1_TextField.setEditable(false);
-			allFrames[0].setFrameScore(0);
+//			allFrames[0].setFrameScore(0);
+			frames.get(0).setFrameScore(0);
 			if (frame1_Roll1_TextField.getText().equals("X")) {
 				frame1_Roll2_TextField.setText("0");
 				frame1_Roll2_TextField.setEditable(false);
 				frame2_Roll1_TextField.setEditable(true);
+				frames.get(0).setStrike(true);
+				frames.get(0).setRoll1Score(MAX_STRIKE_FRAME_SCORE);
+				frames.get(0).setRoll2Score(MIN_STRIKE_FRAME_SCORE);
+				frames.get(0).setFrameScore(MAX_STRIKE_FRAME_SCORE);
 //				allFrames[0].setRoll1Score(10);
 //				allFrames[0].setRoll2Score(0);
 //				allFrames[0].setFrameScore(allFrames[0].calculateFrameScore());
-				allFrames[1].setPreviousFrameHasStrike(true);
+//				allFrames[0].setPreviousFrameHasStrik(true);
 //				gameScore += allFrames[0].getFrameScore();
 //				frame1_Score_TextField.setText(Integer.toString(gameScore));
 			} else {
-				allFrames[0].setRoll1Score(Integer
+//				allFrames[0].setRoll1Score(Integer
+//						.parseInt(frame1_Roll1_TextField.getText()));
+				frames.get(0).setRoll1Score(Integer
 						.parseInt(frame1_Roll1_TextField.getText()));
 				frame1_Roll2_TextField.setEditable(true);
 			}
@@ -520,31 +541,39 @@ public class BowlingGameUI extends JFrame implements PropertyChangeListener {
 				&& (frame1_Roll2_TextField.getText().trim().length() > 0)) {
 			frame1_Roll2_TextField.setEditable(false);
 			frame2_Roll1_TextField.setEditable(true);
-			allFrames[0].setFrameScore(0);
+//			allFrames[0].setFrameScore(0);
+			frames.get(0).setFrameScore(0);
 			if (frame1_Roll2_TextField.getText().equals("/")) {
+				frames.get(0).setSpare(true);
+				frames.get(0).setRoll2Score(MAX_SPARE_FRAME_SCORE);
+				frames.get(0).setFrameScore(MAX_SPARE_FRAME_SCORE);
 //				allFrames[0].setRoll2Score(10);
 //				allFrames[0].setRoll1Score(0);
 //				allFrames[0].setFrameScore(allFrames[0].calculateFrameScore());
-				allFrames[1].setPreviousFrameHasSpare(true);
+//				allFrames[1].setPreviousFrameHasSpare(true);
 //				gameScore += allFrames[0].getFrameScore();
 			} else {
 
-				if (((Integer.parseInt(frame1_Roll2_TextField.getText()) + allFrames[0]
-						.getRoll1Score()) < 10)) {
-					allFrames[0].setRoll2Score(Integer
+				if (((Integer.parseInt(frame1_Roll2_TextField.getText()) + frames.get(0).getRoll1Score()) < 10)) {
+//					allFrames[0].setRoll2Score(Integer
+//							.parseInt(frame1_Roll2_TextField.getText()));
+//					allFrames[0].setFrameScore(calculateFrameScore(allFrames[0]));
+//					gameScore += allFrames[0].getFrameScore();
+					currentFrameIndex = 0;
+					frames.get(0).setRoll2Score(Integer
 							.parseInt(frame1_Roll2_TextField.getText()));
-					allFrames[0].setFrameScore(allFrames[0].calculateFrameScore());
-					gameScore += allFrames[0].getFrameScore();
+					frames.get(0).setFrameScore(calculateFrameScore(currentFrameIndex));
+					gameScore += frames.get(0).getFrameScore();
+					
 					frame1_Score_TextField.setText(Integer.toString(gameScore));
-				} else {
+				} else if((Integer.parseInt(frame1_Roll2_TextField.getText()) + frames.get(0).getRoll1Score()) > 10) {
+					if(!(frames.get(0).isSpare()) || (frames.get(0).isStrike())){
 					frame1_Roll2_TextField.setEditable(true);
 					frame2_Roll1_TextField.setEditable(false);
-					allFrames[0].setRoll2Score(0);
-					JOptionPane
-							.showMessageDialog(
-									contentPane,
-									"Please Enter Correct Value! (Maximum Frame Score is 9)",
-									"Inane error", JOptionPane.ERROR_MESSAGE);
+//					allFrames[0].setRoll2Score(0);
+					frames.get(0).setRoll2Score(0);
+					showWrongScoreInputMessage();
+					}
 				}
 			}
 //			allFrames[0].setFrameScore(allFrames[0].calculateFrameScore());
@@ -552,63 +581,80 @@ public class BowlingGameUI extends JFrame implements PropertyChangeListener {
 //			frame1_Score_TextField.setText(Integer.toString(gameScore));
 		}
 
-		
 		// Frame 2
-				if (source == frame2_Roll1_TextField
-						&& (frame2_Roll1_TextField.getText().trim().length() > 0)) {
-					frame2_Roll1_TextField.setEditable(false);
-					allFrames[1].setFrameScore(0);
-					if (frame2_Roll1_TextField.getText().equals("X")) {
-						frame2_Roll2_TextField.setText("0");
-						frame2_Roll2_TextField.setEditable(false);
-						frame3_Roll1_TextField.setEditable(true);
-//						allFrames[0].setRoll1Score(10);
-//						allFrames[0].setRoll2Score(0);
-						allFrames[0].setFrameScore(allFrames[1].calculateFrameScore());
-						allFrames[2].setPreviousFrameHasStrike(true);
-//						gameScore += allFrames[0].getFrameScore();
-//						frame1_Score_TextField.setText(Integer.toString(gameScore));
-					} else {
-						allFrames[1].setRoll1Score(Integer
-								.parseInt(frame2_Roll1_TextField.getText()));
-						frame2_Roll2_TextField.setEditable(true);
-					}
+		if (source == frame2_Roll1_TextField
+				&& (frame2_Roll1_TextField.getText().trim().length() > 0)) {
+			frame2_Roll1_TextField.setEditable(false);
+//			allFrames[0].setFrameScore(0);
+			frames.get(1).setFrameScore(0);
+			if (frame2_Roll1_TextField.getText().equals("X")) {
+				frame2_Roll2_TextField.setText("0");
+				frame2_Roll2_TextField.setEditable(false);
+				frame3_Roll1_TextField.setEditable(true);
+				frames.get(1).setStrike(true);
+				frames.get(1).setRoll1Score(MAX_STRIKE_FRAME_SCORE);
+				frames.get(1).setRoll2Score(MIN_STRIKE_FRAME_SCORE);
+				frames.get(1).setFrameScore(MAX_STRIKE_FRAME_SCORE);
+//				allFrames[0].setRoll1Score(10);
+//				allFrames[0].setRoll2Score(0);
+//				allFrames[0].setFrameScore(allFrames[0].calculateFrameScore());
+//				allFrames[0].setPreviousFrameHasStrik(true);
+//				gameScore += allFrames[0].getFrameScore();
+//				frame1_Score_TextField.setText(Integer.toString(gameScore));
+			} else {
+//				allFrames[0].setRoll1Score(Integer
+//						.parseInt(frame1_Roll1_TextField.getText()));
+				frames.get(1).setRoll1Score(Integer
+						.parseInt(frame2_Roll1_TextField.getText()));
+				frame2_Roll2_TextField.setEditable(true);
+			}
 
-				} else if (source == frame2_Roll2_TextField
-						&& (frame2_Roll2_TextField.getText().trim().length() > 0)) {
-					frame2_Roll2_TextField.setEditable(false);
-					frame3_Roll1_TextField.setEditable(true);
-					allFrames[1].setFrameScore(0);
-					if (frame2_Roll2_TextField.getText().equals("/")) {
-//						allFrames[0].setRoll2Score(10);
-//						allFrames[0].setRoll1Score(0);
-						allFrames[1].setFrameScore(allFrames[1].calculateFrameScore());
-						allFrames[2].setPreviousFrameHasSpare(true);
-//						gameScore += allFrames[0].getFrameScore();
-					} else {
+		} else if (source == frame2_Roll2_TextField
+				&& (frame2_Roll2_TextField.getText().trim().length() > 0)) {
+			frame2_Roll2_TextField.setEditable(false);
+			frame3_Roll1_TextField.setEditable(true);
+//			allFrames[0].setFrameScore(0);
+			frames.get(1).setFrameScore(0);
+			if (frame2_Roll2_TextField.getText().equals("/")) {
+				frames.get(1).setSpare(true);
+				frames.get(1).setRoll2Score(MAX_SPARE_FRAME_SCORE);
+				frames.get(1).setFrameScore(MAX_SPARE_FRAME_SCORE);
+//				allFrames[0].setRoll2Score(10);
+//				allFrames[0].setRoll1Score(0);
+//				allFrames[0].setFrameScore(allFrames[0].calculateFrameScore());
+//				allFrames[1].setPreviousFrameHasSpare(true);
+//				gameScore += allFrames[0].getFrameScore();
+			} else {
 
-						if (((Integer.parseInt(frame2_Roll2_TextField.getText()) + allFrames[1]
-								.getRoll1Score()) < 10)) {
-							allFrames[1].setRoll2Score(Integer
-									.parseInt(frame2_Roll2_TextField.getText()));
-							allFrames[1].setFrameScore(allFrames[1].calculateFrameScore());
-							gameScore += allFrames[1].getFrameScore();
-							frame2_Score_TextField.setText(Integer.toString(gameScore));
-						} else {
-							frame2_Roll2_TextField.setEditable(true);
-							frame3_Roll1_TextField.setEditable(false);
-							allFrames[1].setRoll2Score(0);
-							JOptionPane
-									.showMessageDialog(
-											contentPane,
-											"Please Enter Correct Value! (Maximum Frame Score is 9)",
-											"Inane error", JOptionPane.ERROR_MESSAGE);
-						}
-					}
-//					allFrames[0].setFrameScore(allFrames[0].calculateFrameScore());
+				if (((Integer.parseInt(frame2_Roll2_TextField.getText()) + frames.get(1).getRoll1Score()) < 10)) {
+//					allFrames[0].setRoll2Score(Integer
+//							.parseInt(frame1_Roll2_TextField.getText()));
+//					allFrames[0].setFrameScore(calculateFrameScore(allFrames[0]));
 //					gameScore += allFrames[0].getFrameScore();
-//					frame1_Score_TextField.setText(Integer.toString(gameScore));
+					currentFrameIndex = 1;
+					frames.get(1).setRoll2Score(Integer
+							.parseInt(frame2_Roll2_TextField.getText()));
+					frames.get(1).setFrameScore(calculateFrameScore(currentFrameIndex));
+					if(frames.get(currentFrameIndex-1).isSpare() ||frames.get(currentFrameIndex-1).isStrike()){
+						frame1_Score_TextField.setText(Integer.toString(gameScore));
+					}
+					gameScore += frames.get(1).getFrameScore();		
+					frame2_Score_TextField.setText(Integer.toString(gameScore));
+				} else if(((Integer.parseInt(frame2_Roll2_TextField.getText()) + frames.get(1).getRoll1Score()) > 10)){
+					if(!(frames.get(1).isSpare()) || (frames.get(1).isStrike())){
+					frame2_Roll2_TextField.setEditable(true);
+					frame3_Roll1_TextField.setEditable(false);
+//					allFrames[0].setRoll2Score(0);
+					frames.get(1).setRoll2Score(0);
+					showWrongScoreInputMessage();
+					}
 				}
+			}
+//			allFrames[0].setFrameScore(allFrames[0].calculateFrameScore());
+//			gameScore += allFrames[0].getFrameScore();
+//			frame1_Score_TextField.setText(Integer.toString(gameScore));
+		}
+
 				
 
 		// Frame 10
@@ -677,5 +723,30 @@ public class BowlingGameUI extends JFrame implements PropertyChangeListener {
 
 	public void setAllFrames(Frame[] allFrames) {
 		this.allFrames = allFrames;
+	}
+	
+	public static int calculateFrameScore(int currentFrameIndex){
+		ListIterator<Frame> listIterator = frames.listIterator(currentFrameIndex); 
+		Frame currentFrame = frames.get(currentFrameIndex);
+		if(listIterator.hasPrevious()){
+			Frame previousFrame = listIterator.previous();
+			if(previousFrame.isStrike()){
+				gameScore += previousFrame.getRoll1Score()+currentFrame.getRoll1Score() + currentFrame.getRoll2Score();
+				previousFrame.setFrameScore(previousFrame.getRoll1Score()+currentFrame.getRoll1Score() + currentFrame.getRoll2Score());
+			}
+			if(previousFrame.isSpare()){
+				gameScore += previousFrame.getRoll2Score()+currentFrame.getRoll1Score();
+				previousFrame.setFrameScore(previousFrame.getRoll2Score() + currentFrame.getRoll1Score());
+			}
+		}
+		return(currentFrame.getRoll1Score() + currentFrame.getRoll2Score());
+	}
+	
+	public static void showWrongScoreInputMessage(){
+		JOptionPane
+		.showMessageDialog(
+				contentPane,
+				"Please Enter Correct Value! (Maximum Frame Score can be 9)",
+				"Inane error", JOptionPane.ERROR_MESSAGE);
 	}
 }
