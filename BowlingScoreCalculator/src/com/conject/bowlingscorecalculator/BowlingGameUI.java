@@ -1,6 +1,7 @@
 package com.conject.bowlingscorecalculator;
 
 import java.awt.Color;
+import java.awt.Cursor;
 import java.awt.EventQueue;
 import java.awt.Font;
 
@@ -124,21 +125,32 @@ public class BowlingGameUI extends JFrame implements PropertyChangeListener {
 	private DefaultFormatterFactory roll1_DefaultFormatterFactory;
 	private DefaultFormatterFactory roll2_DefaultFormatterFactory;
 	private DefaultFormatterFactory frame10_DefaultFormatterFactory;
-	
+
 	public static final int MAX_FRAMES = 10;
+	public static final int MIN_FRAME_SCORE = 0;
+	
+	public static final int MIN_ROLL_SCORE = 0;
+	
 	public static final int MAX_STRIKE_FRAME_SCORE = 10;
 	public static final int MIN_STRIKE_FRAME_SCORE = 0;
+	
 	public static final int MAX_SPARE_FRAME_SCORE = 10;
+	
+	public static final int MIN_SCORE_INPUT_LENGTH = 0;
+	public static final int MAX_FRAME_SCORE_FOR_NUMBER_INPUT = 9;
+	
+	private static final String STRIKE = "X";
+	private static final String SPARE = "/";
 
 	/**
 	 * Create the frame.
 	 */
 	public BowlingGameUI() {
 		frames = new ArrayList<Frame>();
-		for(int i=0;i<MAX_FRAMES;i++){
+		for (int i = 0; i < MAX_FRAMES; i++) {
 			frames.add(new Frame(false, false, 0, 0));
 		}
-		
+
 		allFrames = new Frame[10];
 		allFrames[0] = new Frame(false, false, 0, 0);
 		allFrames[1] = new Frame(false, false, 0, 0);
@@ -511,152 +523,204 @@ public class BowlingGameUI extends JFrame implements PropertyChangeListener {
 		int currentFrameIndex;
 		// Frame 1
 		if (source == frame1_Roll1_TextField
-				&& (frame1_Roll1_TextField.getText().trim().length() > 0)) {
+				&& (frame1_Roll1_TextField.getText().trim().length() > MIN_SCORE_INPUT_LENGTH)) {
+			currentFrameIndex = 0;
 			frame1_Roll1_TextField.setEditable(false);
-//			allFrames[0].setFrameScore(0);
-			frames.get(0).setFrameScore(0);
-			if (frame1_Roll1_TextField.getText().equals("X")) {
-				frame1_Roll2_TextField.setText("0");
+			frames.get(currentFrameIndex).setFrameScore(MIN_FRAME_SCORE);
+			if (frame1_Roll1_TextField.getText().equals(STRIKE)) {
+				frame1_Roll2_TextField.setText(Integer.toString(MIN_ROLL_SCORE));
 				frame1_Roll2_TextField.setEditable(false);
 				frame2_Roll1_TextField.setEditable(true);
-				frames.get(0).setStrike(true);
-				frames.get(0).setRoll1Score(MAX_STRIKE_FRAME_SCORE);
-				frames.get(0).setRoll2Score(MIN_STRIKE_FRAME_SCORE);
-				frames.get(0).setFrameScore(MAX_STRIKE_FRAME_SCORE);
-//				allFrames[0].setRoll1Score(10);
-//				allFrames[0].setRoll2Score(0);
-//				allFrames[0].setFrameScore(allFrames[0].calculateFrameScore());
-//				allFrames[0].setPreviousFrameHasStrik(true);
-//				gameScore += allFrames[0].getFrameScore();
-//				frame1_Score_TextField.setText(Integer.toString(gameScore));
+				frames.get(currentFrameIndex).setStrike(true);
+				frames.get(currentFrameIndex).setRoll1Score(MAX_STRIKE_FRAME_SCORE);
+				frames.get(currentFrameIndex).setRoll2Score(MIN_STRIKE_FRAME_SCORE);
+				frames.get(currentFrameIndex).setFrameScore(MAX_STRIKE_FRAME_SCORE);
 			} else {
-//				allFrames[0].setRoll1Score(Integer
-//						.parseInt(frame1_Roll1_TextField.getText()));
-				frames.get(0).setRoll1Score(Integer
-						.parseInt(frame1_Roll1_TextField.getText()));
+				frames.get(currentFrameIndex).setRoll1Score(
+						Integer.parseInt(frame1_Roll1_TextField.getText()));
 				frame1_Roll2_TextField.setEditable(true);
 			}
 
 		} else if (source == frame1_Roll2_TextField
-				&& (frame1_Roll2_TextField.getText().trim().length() > 0)) {
+				&& (frame1_Roll2_TextField.getText().trim().length() > MIN_SCORE_INPUT_LENGTH)) {
+			currentFrameIndex = 0;
 			frame1_Roll2_TextField.setEditable(false);
 			frame2_Roll1_TextField.setEditable(true);
-//			allFrames[0].setFrameScore(0);
-			frames.get(0).setFrameScore(0);
-			if (frame1_Roll2_TextField.getText().equals("/")) {
-				frames.get(0).setSpare(true);
-				frames.get(0).setRoll2Score(MAX_SPARE_FRAME_SCORE);
-				frames.get(0).setFrameScore(MAX_SPARE_FRAME_SCORE);
-//				allFrames[0].setRoll2Score(10);
-//				allFrames[0].setRoll1Score(0);
-//				allFrames[0].setFrameScore(allFrames[0].calculateFrameScore());
-//				allFrames[1].setPreviousFrameHasSpare(true);
-//				gameScore += allFrames[0].getFrameScore();
+			frames.get(currentFrameIndex).setFrameScore(MIN_FRAME_SCORE);
+			if (frame1_Roll2_TextField.getText().equals(SPARE)) {
+				frames.get(currentFrameIndex).setSpare(true);
+				frames.get(currentFrameIndex).setRoll2Score(MAX_SPARE_FRAME_SCORE);
+				frames.get(currentFrameIndex).setFrameScore(MAX_SPARE_FRAME_SCORE);
 			} else {
-
-				if (((Integer.parseInt(frame1_Roll2_TextField.getText()) + frames.get(0).getRoll1Score()) < 10)) {
-//					allFrames[0].setRoll2Score(Integer
-//							.parseInt(frame1_Roll2_TextField.getText()));
-//					allFrames[0].setFrameScore(calculateFrameScore(allFrames[0]));
-//					gameScore += allFrames[0].getFrameScore();
-					currentFrameIndex = 0;
-					frames.get(0).setRoll2Score(Integer
-							.parseInt(frame1_Roll2_TextField.getText()));
-					frames.get(0).setFrameScore(calculateFrameScore(currentFrameIndex));
-					gameScore += frames.get(0).getFrameScore();
+				if (((Integer.parseInt(frame1_Roll2_TextField.getText()) + frames
+						.get(0).getRoll1Score()) <= MAX_FRAME_SCORE_FOR_NUMBER_INPUT)) {
 					
+					frames.get(currentFrameIndex).setRoll2Score(
+							Integer.parseInt(frame1_Roll2_TextField.getText()));
+					frames.get(currentFrameIndex).setFrameScore(
+							calculateFrameScore(currentFrameIndex));
+					gameScore += frames.get(currentFrameIndex).getFrameScore();
+
 					frame1_Score_TextField.setText(Integer.toString(gameScore));
-				} else if((Integer.parseInt(frame1_Roll2_TextField.getText()) + frames.get(0).getRoll1Score()) > 10) {
-					if(!(frames.get(0).isSpare()) || (frames.get(0).isStrike())){
-					frame1_Roll2_TextField.setEditable(true);
-					frame2_Roll1_TextField.setEditable(false);
-//					allFrames[0].setRoll2Score(0);
-					frames.get(0).setRoll2Score(0);
-					showWrongScoreInputMessage();
+				} else if ((Integer.parseInt(frame1_Roll2_TextField.getText()) + frames
+						.get(currentFrameIndex).getRoll1Score()) > MAX_FRAME_SCORE_FOR_NUMBER_INPUT) {
+					if (!(frames.get(currentFrameIndex).isSpare())
+							&& !(frames.get(currentFrameIndex).isStrike())) {
+						frame1_Roll2_TextField.setEditable(true);
+						frame2_Roll1_TextField.setEditable(false);
+						frames.get(currentFrameIndex).setRoll2Score(MIN_ROLL_SCORE);
+						showWrongScoreInputMessage();
 					}
 				}
 			}
-//			allFrames[0].setFrameScore(allFrames[0].calculateFrameScore());
-//			gameScore += allFrames[0].getFrameScore();
-//			frame1_Score_TextField.setText(Integer.toString(gameScore));
 		}
 
 		// Frame 2
 		if (source == frame2_Roll1_TextField
-				&& (frame2_Roll1_TextField.getText().trim().length() > 0)) {
+				&& (frame2_Roll1_TextField.getText().trim().length() > MIN_SCORE_INPUT_LENGTH)) {
+			currentFrameIndex = 1;
 			frame2_Roll1_TextField.setEditable(false);
-//			allFrames[0].setFrameScore(0);
-			frames.get(1).setFrameScore(0);
-			if (frame2_Roll1_TextField.getText().equals("X")) {
-				frame2_Roll2_TextField.setText("0");
+			frames.get(currentFrameIndex).setFrameScore(MIN_FRAME_SCORE);
+			if (frame2_Roll1_TextField.getText().equals(STRIKE)) {
+				frame2_Roll2_TextField.setText(Integer.toString(MIN_ROLL_SCORE));
 				frame2_Roll2_TextField.setEditable(false);
 				frame3_Roll1_TextField.setEditable(true);
-				frames.get(1).setStrike(true);
-				frames.get(1).setRoll1Score(MAX_STRIKE_FRAME_SCORE);
-				frames.get(1).setRoll2Score(MIN_STRIKE_FRAME_SCORE);
-				frames.get(1).setFrameScore(MAX_STRIKE_FRAME_SCORE);
-//				allFrames[0].setRoll1Score(10);
-//				allFrames[0].setRoll2Score(0);
-//				allFrames[0].setFrameScore(allFrames[0].calculateFrameScore());
-//				allFrames[0].setPreviousFrameHasStrik(true);
-//				gameScore += allFrames[0].getFrameScore();
-//				frame1_Score_TextField.setText(Integer.toString(gameScore));
+				frames.get(currentFrameIndex).setStrike(true);
+				frames.get(currentFrameIndex).setRoll1Score(MAX_STRIKE_FRAME_SCORE);
+				frames.get(currentFrameIndex).setRoll2Score(MIN_STRIKE_FRAME_SCORE);
+				frames.get(currentFrameIndex).setFrameScore(MAX_STRIKE_FRAME_SCORE);
+				calculateFrameScoreForStrike(currentFrameIndex);
+				if (frames.get(currentFrameIndex - 1).isSpare()) {
+					frame1_Score_TextField.setText(Integer
+							.toString(gameScore));
+				}
+				/*else if(frames.get(currentFrameIndex - 1).isStrike()){
+					if(frames.get(currentFrameIndex - 2) != null && frames.get(currentFrameIndex - 2).isStrike()){
+						frame1_Score_TextField.setText(Integer
+								.toString(gameScore));
+					}
+				}*/
 			} else {
-//				allFrames[0].setRoll1Score(Integer
-//						.parseInt(frame1_Roll1_TextField.getText()));
-				frames.get(1).setRoll1Score(Integer
-						.parseInt(frame2_Roll1_TextField.getText()));
+				frames.get(currentFrameIndex).setRoll1Score(
+						Integer.parseInt(frame2_Roll1_TextField.getText()));
 				frame2_Roll2_TextField.setEditable(true);
 			}
 
 		} else if (source == frame2_Roll2_TextField
-				&& (frame2_Roll2_TextField.getText().trim().length() > 0)) {
+				&& (frame2_Roll2_TextField.getText().trim().length() > MIN_SCORE_INPUT_LENGTH)) {
+			currentFrameIndex = 1;
 			frame2_Roll2_TextField.setEditable(false);
 			frame3_Roll1_TextField.setEditable(true);
-//			allFrames[0].setFrameScore(0);
-			frames.get(1).setFrameScore(0);
-			if (frame2_Roll2_TextField.getText().equals("/")) {
-				frames.get(1).setSpare(true);
-				frames.get(1).setRoll2Score(MAX_SPARE_FRAME_SCORE);
-				frames.get(1).setFrameScore(MAX_SPARE_FRAME_SCORE);
-//				allFrames[0].setRoll2Score(10);
-//				allFrames[0].setRoll1Score(0);
-//				allFrames[0].setFrameScore(allFrames[0].calculateFrameScore());
-//				allFrames[1].setPreviousFrameHasSpare(true);
-//				gameScore += allFrames[0].getFrameScore();
+			frames.get(currentFrameIndex).setFrameScore(MIN_FRAME_SCORE);
+			if (frame2_Roll2_TextField.getText().equals(SPARE)) {
+				frames.get(currentFrameIndex).setSpare(true);
+				frames.get(currentFrameIndex).setRoll2Score(MAX_SPARE_FRAME_SCORE);
+				frames.get(currentFrameIndex).setFrameScore(MAX_SPARE_FRAME_SCORE);
+				calculateFrameScoreForSpare(currentFrameIndex);
 			} else {
 
-				if (((Integer.parseInt(frame2_Roll2_TextField.getText()) + frames.get(1).getRoll1Score()) < 10)) {
-//					allFrames[0].setRoll2Score(Integer
-//							.parseInt(frame1_Roll2_TextField.getText()));
-//					allFrames[0].setFrameScore(calculateFrameScore(allFrames[0]));
-//					gameScore += allFrames[0].getFrameScore();
-					currentFrameIndex = 1;
-					frames.get(1).setRoll2Score(Integer
-							.parseInt(frame2_Roll2_TextField.getText()));
-					frames.get(1).setFrameScore(calculateFrameScore(currentFrameIndex));
-					if(frames.get(currentFrameIndex-1).isSpare() ||frames.get(currentFrameIndex-1).isStrike()){
-						frame1_Score_TextField.setText(Integer.toString(gameScore));
+				if (((Integer.parseInt(frame2_Roll2_TextField.getText()) + frames
+						.get(currentFrameIndex).getRoll1Score()) <= MAX_FRAME_SCORE_FOR_NUMBER_INPUT)) {
+					frames.get(currentFrameIndex).setRoll2Score(
+							Integer.parseInt(frame2_Roll2_TextField.getText()));
+					frames.get(currentFrameIndex).setFrameScore(
+							calculateFrameScore(currentFrameIndex));
+					if (frames.get(currentFrameIndex - 1).isSpare()
+							|| frames.get(currentFrameIndex - 1).isStrike()) {
+						frame1_Score_TextField.setText(Integer
+								.toString(gameScore));
 					}
-					gameScore += frames.get(1).getFrameScore();		
+					gameScore += frames.get(currentFrameIndex).getFrameScore();
 					frame2_Score_TextField.setText(Integer.toString(gameScore));
-				} else if(((Integer.parseInt(frame2_Roll2_TextField.getText()) + frames.get(1).getRoll1Score()) > 10)){
-					if(!(frames.get(1).isSpare()) || (frames.get(1).isStrike())){
-					frame2_Roll2_TextField.setEditable(true);
-					frame3_Roll1_TextField.setEditable(false);
-//					allFrames[0].setRoll2Score(0);
-					frames.get(1).setRoll2Score(0);
-					showWrongScoreInputMessage();
+				} else if (((Integer.parseInt(frame2_Roll2_TextField.getText()) + frames
+						.get(currentFrameIndex).getRoll1Score()) > MAX_FRAME_SCORE_FOR_NUMBER_INPUT)) {
+					if (!(frames.get(currentFrameIndex).isSpare())
+							&& !(frames.get(currentFrameIndex).isStrike())) {
+						frame2_Roll2_TextField.setEditable(true);
+						frame3_Roll1_TextField.setEditable(false);
+						frames.get(currentFrameIndex).setRoll2Score(MIN_ROLL_SCORE);
+						showWrongScoreInputMessage();
 					}
 				}
 			}
-//			allFrames[0].setFrameScore(allFrames[0].calculateFrameScore());
-//			gameScore += allFrames[0].getFrameScore();
-//			frame1_Score_TextField.setText(Integer.toString(gameScore));
 		}
 
-				
+		// Frame 3
+		if (source == frame3_Roll1_TextField
+				&& (frame3_Roll1_TextField.getText().trim().length() > MIN_SCORE_INPUT_LENGTH)) {
+			currentFrameIndex = 2;
+			frame3_Roll1_TextField.setEditable(false);
+			frames.get(currentFrameIndex).setFrameScore(MIN_FRAME_SCORE);
+			if (frame3_Roll1_TextField.getText().equals(STRIKE)) {
+				frame3_Roll2_TextField.setText(Integer.toString(MIN_ROLL_SCORE));
+				frame3_Roll2_TextField.setEditable(false);
+				frame4_Roll1_TextField.setEditable(true);
+				frames.get(currentFrameIndex).setStrike(true);
+				frames.get(currentFrameIndex).setRoll1Score(MAX_STRIKE_FRAME_SCORE);
+				frames.get(currentFrameIndex).setRoll2Score(MIN_STRIKE_FRAME_SCORE);
+				frames.get(currentFrameIndex).setFrameScore(MAX_STRIKE_FRAME_SCORE);
+				calculateFrameScoreForStrike(currentFrameIndex);
+				if (frames.get(currentFrameIndex - 1).isSpare()) {
+					frame2_Score_TextField.setText(Integer
+							.toString(gameScore));
+				}
+				else if(frames.get(currentFrameIndex - 1).isStrike()){
+					if(frames.get(currentFrameIndex - 2) != null && frames.get(currentFrameIndex - 2).isStrike()){
+						frame1_Score_TextField.setText(Integer
+								.toString(gameScore));
+					}
+				}
+			} else {
+				frames.get(currentFrameIndex).setRoll1Score(
+						Integer.parseInt(frame3_Roll1_TextField.getText()));
+				frame3_Roll2_TextField.setEditable(true);
+			}
 
+		} else if (source == frame3_Roll2_TextField
+				&& (frame3_Roll2_TextField.getText().trim().length() > MIN_SCORE_INPUT_LENGTH)) {
+			currentFrameIndex = 2;
+			frame3_Roll2_TextField.setEditable(false);
+			frame4_Roll1_TextField.setEditable(true);
+			frames.get(currentFrameIndex).setFrameScore(MIN_FRAME_SCORE);
+			if (frame3_Roll2_TextField.getText().equals(SPARE)) {
+				frames.get(currentFrameIndex).setSpare(true);
+				frames.get(currentFrameIndex).setRoll2Score(MAX_SPARE_FRAME_SCORE);
+				frames.get(currentFrameIndex).setFrameScore(MAX_SPARE_FRAME_SCORE);
+			} else {
+
+				if (((Integer.parseInt(frame3_Roll2_TextField.getText()) + frames
+						.get(currentFrameIndex).getRoll1Score()) <= MAX_FRAME_SCORE_FOR_NUMBER_INPUT)) {
+					frames.get(currentFrameIndex).setRoll2Score(
+							Integer.parseInt(frame3_Roll2_TextField.getText()));
+					frames.get(currentFrameIndex).setFrameScore(
+							calculateFrameScore(currentFrameIndex));
+					if (frames.get(currentFrameIndex - 1).isSpare()
+							|| frames.get(currentFrameIndex - 1).isStrike()) {
+						frame2_Score_TextField.setText(Integer
+								.toString(gameScore));
+					}
+					gameScore += frames.get(currentFrameIndex).getFrameScore();
+					frame3_Score_TextField.setText(Integer.toString(gameScore));
+				} else if (((Integer.parseInt(frame3_Roll2_TextField.getText()) + frames
+						.get(currentFrameIndex).getRoll1Score()) > MAX_FRAME_SCORE_FOR_NUMBER_INPUT)) {
+					if (!(frames.get(currentFrameIndex).isSpare())
+							&& !(frames.get(currentFrameIndex).isStrike())) {
+						frame3_Roll2_TextField.setEditable(true);
+						frame4_Roll1_TextField.setEditable(false);
+						frames.get(currentFrameIndex).setRoll2Score(MIN_ROLL_SCORE);
+						showWrongScoreInputMessage();
+					}
+				}
+			}
+		}
+		// Frame 4
+		// Frame 5
+		// Frame 6
+		// Frame 7
+		// Frame 8
+		// Frame 9
+		
+				
 		// Frame 10
 		if (source == frame10_Roll1_TextField
 				&& (frame10_Roll1_TextField.getText().trim().length() > 0)) {
@@ -709,12 +773,6 @@ public class BowlingGameUI extends JFrame implements PropertyChangeListener {
 						.getText());
 			}
 		}
-
-		/*
-		 * frame1_Score = frame1_Roll1_Score + frame1_Roll2_Score;
-		 * frame1_Score_TextField.setText(Integer.toString(frame1_Score));
-		 */
-
 	}
 
 	public Frame[] getAllFrames() {
@@ -724,28 +782,64 @@ public class BowlingGameUI extends JFrame implements PropertyChangeListener {
 	public void setAllFrames(Frame[] allFrames) {
 		this.allFrames = allFrames;
 	}
-	
-	public static int calculateFrameScore(int currentFrameIndex){
-		ListIterator<Frame> listIterator = frames.listIterator(currentFrameIndex); 
+
+	public static int calculateFrameScore(int currentFrameIndex) {
+		ListIterator<Frame> listIterator = frames
+				.listIterator(currentFrameIndex);
 		Frame currentFrame = frames.get(currentFrameIndex);
-		if(listIterator.hasPrevious()){
+		if (listIterator.hasPrevious()) {
 			Frame previousFrame = listIterator.previous();
-			if(previousFrame.isStrike()){
-				gameScore += previousFrame.getRoll1Score()+currentFrame.getRoll1Score() + currentFrame.getRoll2Score();
-				previousFrame.setFrameScore(previousFrame.getRoll1Score()+currentFrame.getRoll1Score() + currentFrame.getRoll2Score());
+			if (previousFrame.isStrike()) {
+				gameScore += previousFrame.getRoll1Score()
+						+ currentFrame.getRoll1Score()
+						+ currentFrame.getRoll2Score();
+				previousFrame.setFrameScore(previousFrame.getRoll1Score()
+						+ currentFrame.getRoll1Score()
+						+ currentFrame.getRoll2Score());
 			}
-			if(previousFrame.isSpare()){
-				gameScore += previousFrame.getRoll2Score()+currentFrame.getRoll1Score();
-				previousFrame.setFrameScore(previousFrame.getRoll2Score() + currentFrame.getRoll1Score());
+			if (previousFrame.isSpare()) {
+				gameScore += previousFrame.getRoll2Score()
+						+ currentFrame.getRoll1Score();
+				previousFrame.setFrameScore(previousFrame.getRoll2Score()
+						+ currentFrame.getRoll1Score());
 			}
 		}
-		return(currentFrame.getRoll1Score() + currentFrame.getRoll2Score());
+		return (currentFrame.getRoll1Score() + currentFrame.getRoll2Score());
 	}
 	
-	public static void showWrongScoreInputMessage(){
-		JOptionPane
-		.showMessageDialog(
-				contentPane,
+	public static void calculateFrameScoreForStrike(int currentFrameIndex) {
+		ListIterator<Frame> listIterator = frames
+				.listIterator(currentFrameIndex);
+		Frame currentFrame = frames.get(currentFrameIndex);
+		if (listIterator.hasPrevious()) {
+			Frame previousFrame = listIterator.previous();
+			if (previousFrame.isStrike()) {
+				if (listIterator.hasPrevious()) {
+					Frame previousOfPreviousFrame = listIterator.previous();
+					if (previousOfPreviousFrame.isStrike()) {
+						gameScore += previousOfPreviousFrame.getRoll1Score()+ previousFrame.getRoll1Score() + currentFrame.getRoll1Score();
+						previousOfPreviousFrame.setFrameScore(previousOfPreviousFrame.getRoll1Score()+ previousFrame.getRoll1Score() + currentFrame.getRoll1Score());
+					}
+				}
+			}
+			else if(previousFrame.isSpare()){
+				if (listIterator.hasPrevious()) {
+						Frame previousOfPreviousFrame = listIterator.previous();
+						gameScore += previousOfPreviousFrame.getFrameScore()+ previousFrame.getRoll2Score() + currentFrame.getRoll1Score();
+						previousOfPreviousFrame.setFrameScore(previousOfPreviousFrame.getRoll1Score()+ previousFrame.getRoll1Score() + currentFrame.getRoll1Score());
+				}
+				
+			}
+		}
+		
+	}
+	
+	public static void calculateFrameScoreForSpare(int currentFrameIndex) {
+		
+	}
+	
+	public static void showWrongScoreInputMessage() {
+		JOptionPane.showMessageDialog(contentPane,
 				"Please Enter Correct Value! (Maximum Frame Score can be 9)",
 				"Inane error", JOptionPane.ERROR_MESSAGE);
 	}
